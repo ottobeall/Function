@@ -1,6 +1,11 @@
 Function a = new Function();
 Function b = new Function();
 Exponential c = new Exponential(2,(float)Math.E);
+Button chooseNomial;
+Button chooseSinusoidal;
+Button chooseExponential;
+Button[] buttons = new Button[3];
+String stage = "Passive";
 void setup()
 {
   background(0);
@@ -18,9 +23,146 @@ void setup()
   println(b.name());
   println(c.value(PI));
   println(c.name());
+  chooseNomial = new Button(width/6,200,150,50,150,0,0, "Nomial");
+  chooseSinusoidal = new Button(width/2,200,150,50,0,150,0, "Sinusoidal");
+  chooseExponential = new Button(5*width/6,200,150,50,0,0,150, "Exponential");
+  buttons[0] = chooseNomial;
+  PFont mono = createFont("Lucida Console",32);
+  textFont(mono);
+ 
 }
 void draw()
 {
+  background(0);
+  fill(255);
+  textSize(32);
+  textAlign(CENTER,TOP);
+  text("Function Generator",width/2,50);
+  textAlign(LEFT,TOP);
+  textSize(12);
+  text("f(x) = " + a.name(),10,100, width-10,150);
+  chooseNomial.conjure();
+  chooseSinusoidal.conjure();
+  chooseExponential.conjure();
+  checkStages();
+  if(stage == "Passive"){}
+  else if (stage == "Nomial")
+  {
+    textAlign(CENTER,TOP);
+    fill(255,255,255);
+    text("Coefficient",width/6,250);
+    text("Exponent",width/6,280);
+  }
+  else if (stage == "Sinusoidal")
+  {
+    textAlign(CENTER,TOP);
+    fill(255,255,255);
+    text("Coefficient",width/2,250);
+    text("Type",width/2,280);
+  }
+  else if (stage == "Exponential")
+  {
+    textAlign(CENTER,TOP);
+    fill(255,255,255);
+    text("Coefficient",5*width/6,250);
+    text("Base",5*width/6,280);
+  }
+  println(stage);
+}
+void checkStages()
+{
+  for(int i = 0; i < buttons.length; i++)
+  {
+    buttons[i].checkActivation();
+  }
+  for(int i = 0; i < buttons.length; i++)
+  {
+    if(buttons[i].activated == 2)
+    {
+      stage = buttons[i].name;
+      for(int j = 0; j < buttons.length; j++)
+      {
+        if(buttons[i] != buttons[j])
+        {
+          buttons[j].activated = 0;
+        }
+      }
+    }
+  }
+}
+class Button
+{
+  float xCenter;
+  float yCenter;
+  float xLength;
+  float yLength;
+  color cLight;
+  color cDark;
+  String name;
+  int activated = 0;
+  Button(float xCenterTemporary, float yCenterTemporary, float xLengthTemporary, float yLengthTemporary, int r, int g, int b, String nameTemporary)
+  {
+    xCenter = xCenterTemporary;
+    yCenter = yCenterTemporary;
+    xLength = xLengthTemporary;
+    yLength = yLengthTemporary;
+    cLight = color(r,g,b);
+    cDark = color(r/10,g/10,b/10);
+    name = nameTemporary;
+  }
+  void conjure()
+  {
+    rectMode(CENTER);
+    if(beingTouched())
+    {
+      fill(cLight);
+    }
+    else
+    {
+      fill(cDark);
+    }
+    stroke(255);
+    strokeWeight(5);
+    rect(xCenter,yCenter,xLength,yLength);
+    rectMode(CORNER);
+    textAlign(CENTER,CENTER);
+    fill(255,255,255);
+    text(name,xCenter,yCenter);
+  }
+  void checkActivation()
+  {
+    if(beingClicked())
+    {
+      if(activated == 0)
+      { 
+        activated = 1;
+      }
+      if(activated == 2)
+      {
+        activated = 3;
+      }
+    }
+    if(!beingClicked())
+    {
+      if(activated == 1)
+      {
+        activated = 2;  
+      }
+      if(activated == 3)
+      {
+        activated = 0;
+      }
+    }
+  }
+  boolean beingTouched()
+  {
+    return (mouseX > xCenter - xLength/2 && mouseX < xCenter + xLength/2) && (mouseY > yCenter - yLength/2 && mouseY < yCenter + yLength/2);
+  }
+  boolean beingClicked()
+  {
+    return (mousePressed && beingTouched());
+
+  }
 }
 class Nomial
 {
@@ -182,14 +324,14 @@ class Exponential
       {
         if(coefficient == round(coefficient))
         {
-          y += round(coefficient);
+          y += round(coefficient) + "*";
         }
         else
         {
-          y += coefficient;
+          y += coefficient + "*";
         }
       }
-      y += "*" + base + "^x";
+      y += base + "^x";
     }
     return y;
   }
